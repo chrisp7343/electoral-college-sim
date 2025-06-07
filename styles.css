@@ -1,0 +1,110 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: white;
+    margin: auto;
+    background-color: bisque;
+}
+
+.flexbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: auto;
+}
+
+.sidebar {
+    width: 28%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.timebox {
+    margin: 0% 2.5%;
+    width: 90%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid black;
+    background-color: orange;
+    overflow: auto;
+    padding: 10px;
+}
+
+#feedbox {
+    margin: 0% 2.5%;
+    width: 90%;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 1px solid black;
+    background-color: yellow;
+    overflow-y: auto;
+}
+
+.infobox {
+    margin: 0% 2.5%;
+    width: 90%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid black;
+    background-color: lightblue;
+    overflow: auto;
+    padding: 10px;
+}
+
+.svg-container {
+    width: 70%;
+    height: auto;
+    border: 1px solid black;
+}
+
+#usmap {
+    width: 100%;
+    height: auto;
+}
+
+@media screen and (max-width: 650px) {
+    .flexbox {
+        flex-direction: column;
+    }
+    .svg-container {
+        width: 100%;
+    }
+    .sidebar {
+        width: 100%;
+        height: 40%;
+    }
+    .infobox {
+        width: 45%;
+        height: 100%;
+        margin: auto;
+    }
+    #feedbox {
+        width: 45%;
+        height: 100%;
+        margin: auto;
+    }
+}
+
+.test {
+    background-color: lightblue;
+}
+
+.test:hover {
+    background-color: lightgreen;
+    cursor: pointer;
+}
+
+.al {
+    fill: red;
+}
+
+.state path:hover {
+    fill: lightgreen;
+    cursor: pointer;
+}
+
+.dccircle:hover {
+    fill: lightgreen;
+    cursor: pointer;
+}
+
