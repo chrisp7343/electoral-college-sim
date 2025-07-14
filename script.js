@@ -1,6 +1,22 @@
+var globaltime = -1;
+var globalnumupdates = 0;
+
+
+var globalshift = 0;
+var globalnationalrvotes = 0;
+var globalnationaldvotes = 0;
+var revs = 0;
+var devs = 0;
+
+var nationalclicked = true;
+var currentclickedstate = "";
+var currentmapsetting = "calls";
+
 var statesnotcounting = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"];
 var statescounting = [];
 var statescounted = [];
+var calledfordems = [];
+var calledforreps = [];
 
 const stateFixedData = {
     "AL": {statename : "Alabama", electoralvotes: 9, expectedpopularvote: 2200000, expectedmargin: 30, starttime: 60, countingspeed: [1.1, 4]},
@@ -112,6 +128,26 @@ var stateVarData = {
 
 function increaseTime() {
     globaltime += 1;   
+    for (let state of [...statesnotcounting]) {
+        checkIfClosed(state);
+    }
+    for (let state of statescounting) {
+        addVotes(state);
+    }
+    for (let state of statescounting) {
+        if (stateVarData[state].status == "Polls Closed") {
+            callState(state);  
+        }
+    }
+    for (let state of [...statescounting]) {
+        checkStateDoneCounting(state);
+    }
+    if (nationalclicked === true) {
+        showNationalInfo();
+    } else {
+        showStateInfo();
+    }
+
     document.getElementById("time").innerHTML = globaltime + " minutes";
 }
 
@@ -122,3 +158,136 @@ function increaseTime5() {
     increaseTime();
     increaseTime();
 }
+
+function increaseTime15() {
+    increaseTime5();
+    increaseTime5();
+    increaseTime5();
+}
+
+function increaseTime60() {
+    increaseTime15();
+    increaseTime15();
+    increaseTime15();
+    increaseTime15();
+}
+
+// State Name, # Electoral Votes, % Reported, D Total (%), R Total (%), Total Votes
+function showStateInfo(state = currentclickedstate) {
+    nationalclicked = false;
+    currentclickedstate = state;
+
+    document.getElementById("statebutton").innerHTML = stateFixedData[state].statename;
+    let rrvotes = `Republican: ${stateVarData[state].rvotes}`;
+    let rdvotes = `Democrat: ${stateVarData[state].dvotes}`;
+    document.getElementById("reportingamount").innerHTML=`${stateVarData[state].iterations / 2}% Reporting`
+    if (stateVarData[state].dvotes > stateVarData[state].rvotes) {
+        document.getElementById("winningvotes").innerHTML = rdvotes;
+        document.getElementById("winningvotes").style.color = "blue";
+        document.getElementById("losingvotes").innerHTML = rrvotes;
+        document.getElementById("losingvotes").style.color = "red";
+    } else {
+        document.getElementById("winningvotes").innerHTML = rrvotes;
+        document.getElementById("winningvotes").style.color = "red";
+        document.getElementById("losingvotes").innerHTML = rdvotes;
+        document.getElementById("losingvotes").style.color = "blue";
+    }
+    document.getElementById("statestatus").innerHTML = stateVarData[state].status;
+}
+
+function showNationalInfo() {
+    nationalclicked = true;
+
+    let rrvotes = `Republican: ${globalnationalrvotes}`
+    let rdvotes = `Democrat: ${globalnationaldvotes}`
+    document.getElementById("reportingamount").innerHTML = `Republican: ${revs} - Democratic: ${devs}`;
+    if (globalnationaldvotes > globalnationalrvotes) {
+        document.getElementById("winningvotes").innerHTML = rdvotes;
+        document.getElementById("winningvotes").style.color = "blue";
+        document.getElementById("losingvotes").innerHTML = rrvotes;
+        document.getElementById("losingvotes").style.color = "red";
+    } else {
+        document.getElementById("winningvotes").innerHTML = rrvotes;
+        document.getElementById("winningvotes").style.color = "red";
+        document.getElementById("losingvotes").innerHTML = rdvotes;
+        document.getElementById("losingvotes").style.color = "blue";
+    }
+    document.getElementById("statestatus").innerHTML = ".";
+}
+
+function checkForUpdates () {
+
+}
+
+function addEvent(text, color, bold = false) {
+    globalnumupdates += 1;
+    const event = document.createElement("div");
+    event.style.justifyContent = "space-between";
+    event.style.display = "flex";
+    event.style.flexWrap = "wrap";
+    event.style.alignItems = "center";
+    event.style.gap = "4px";
+
+    const timestamp = document.createElement("span");
+    timestamp.innerHTML = globaltime;
+    timestamp.style.color = "gray";
+    timestamp.style.fontSize = "0.9em";
+
+    const eventText = document.createElement("span");
+    eventText.innerHTML = text;
+    eventText.style.color = color;
+    eventText.style.flex = "1"; 
+    eventText.style.minWidth = "0"; 
+    if (bold == true) {
+        eventText.style.fontWeight = "bold";
+    }
+
+    event.appendChild(timestamp);
+    event.appendChild(eventText);
+
+    if(globalnumupdates % 2 == 1) {
+        event.style.backgroundColor = "lightblue";
+    } else {
+        event.style.backgroundColor = "lightgreen";
+    }
+    
+    document.getElementById("feedbox").appendChild(event);
+    document.getElementById("feedbox").scrollTop = document.getElementById("feedbox").scrollHeight;
+}
+
+function removeItem (list, item) {
+    const index = list.indexOf(item);
+
+    if (index !== -1) {
+        list.splice(index, 1);
+    }
+}
+
+function checkIfClosed(state) {
+    if (stateFixedData[state].starttime == globaltime) {
+        statescounting.push(state);
+        removeItem(statesnotcounting, state);
+        stateVarData[state].status = "Polls Closed";
+        addEvent(`${stateFixedData[state].statename} has closed polls.`, "black");
+    }
+}
+
+function addVotes(state) {
+    let rand = Math.random();
+    let numberofiterations = Math.floor(rand*((1 - stateVarData[state].iterations / 200) * (stateFixedData[state].countingspeed[1] - stateFixedData[state].countingspeed[0]) + stateFixedData[state].countingspeed[0]));
+    
+    if (numberofiterations !== 0) {
+        for (let i = 0; i < numberofiterations; i++) {
+            let rVotesToAdd = Math.floor(Math.random() * (stateFixedData[state].expectedpopularvote / 10000) * (50 + ((stateFixedData[state].expectedmargin + globalshift) / 2)));
+            let dVotesToAdd = Math.floor(Math.random() * (stateFixedData[state].expectedpopularvote / 10000) * (50 - ((stateFixedData[state].expectedmargin + globalshift) / 2)));
+            stateVarData[state].rvotes += rVotesToAdd;
+            stateVarData[state].dvotes += dVotesToAdd;
+            globalnationalrvotes += rVotesToAdd;
+            globalnationaldvotes += dVotesToAdd;
+            stateVarData[state].iterations += 1;
+        }
+        updateMargins(state);
+        updatePReported(state);
+    }
+}
+
