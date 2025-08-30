@@ -291,3 +291,160 @@ function addVotes(state) {
     }
 }
 
+function callState(state) {
+    var numoftests = 0;
+    for (let i = 0; i < 10; i ++ ) {
+        let rvotesplus20 = stateVarData[state].rvotes;
+        let dvotesplus20 = stateVarData[state].dvotes;
+        
+        for (let i = stateVarData[state].iterations; i < 200; i++) {
+            rvotesplus20 += Math.floor(Math.random() * (stateFixedData[state].expectedpopularvote / 10000) * (50 + ((stateFixedData[state].expectedmargin + 15) / 2)));
+            dvotesplus20 += Math.floor(Math.random() * (stateFixedData[state].expectedpopularvote / 10000) * (50 - ((stateFixedData[state].expectedmargin + 15) / 2)));
+        }
+        if (rvotesplus20 > dvotesplus20) {
+            numoftests += 1
+        } else if (dvotesplus20 > rvotesplus20) {
+            numoftests -= 1
+        }
+
+        let rvotesminus20 = stateVarData[state].rvotes;
+        let dvotesminus20 = stateVarData[state].dvotes;
+
+        for (let i = stateVarData[state].iterations; i < 200; i++) {
+            rvotesminus20 += Math.floor(Math.random() * (stateFixedData[state].expectedpopularvote / 10000) * (50 + ((stateFixedData[state].expectedmargin - 20) / 2)));
+            dvotesminus20 += Math.floor(Math.random() * (stateFixedData[state].expectedpopularvote / 10000) * (50 - ((stateFixedData[state].expectedmargin - 20) / 2)));
+        }
+
+        if (rvotesminus20 > dvotesminus20) {
+            numoftests += 1;
+        } else if (dvotesminus20 > rvotesminus20) {
+            numoftests -= 1;
+        }
+
+    }
+
+    if (numoftests === 20) {
+        stateVarData[state].status = "Called for Republicans";
+        addEvent(`${stateFixedData[state].statename} called for Republicans`, "red");
+        calledforreps.push(state);
+        document.getElementById(state+"c").style.fill = "rgb(230, 100, 100)"; 
+        revs += stateFixedData[state].electoralvotes;
+        
+    } else if (numoftests === -20) {
+        stateVarData[state].status = "Called for Democrats";
+        addEvent(`${stateFixedData[state].statename} called for Democrats`, "blue");   
+        calledfordems.push(state); 
+        document.getElementById(state+"c").style.fill = "rgb(100, 100, 230)";
+        devs += stateFixedData[state].electoralvotes;
+    }
+}
+
+function checkStateDoneCounting(state) {
+    if (stateVarData[state].iterations === 200) {
+        removeItem(statescounting, state);
+        statescounted.push(state);
+    }
+}
+
+function updateMargins(state) {
+    const rpct = stateVarData[state].rvotes / ((stateVarData[state].rvotes) + (stateVarData[state].dvotes)) * 100;
+    const dpct = stateVarData[state].dvotes / ((stateVarData[state].rvotes) + (stateVarData[state].dvotes)) * 100;
+    margin = rpct - dpct;
+
+    if (margin > 0) {
+        if (margin <= 20) {
+            document.getElementById(state+"m").style.fill = `rgb(255, ${250 - (margin * 8)}, ${250 - (margin * 8)})`
+        } else {
+            document.getElementById(state+"m").style.fill = `rgb(${275 - margin}, ${110 - margin}, ${110 - margin})`
+        }
+    } else {
+        if (margin >= -20) {
+            document.getElementById(state+"m").style.fill = `rgb(${250 + (margin * 8)}, ${250 + (margin * 8)}, 255)`
+        } else {
+            document.getElementById(state+"m").style.fill = `rgb(${110 + margin}, ${110 + margin}, ${275 + margin})`
+        }
+    }
+}
+
+function updatePReported(state) {
+    if (stateVarData[state].iterations <= 140) {
+        document.getElementById(state+"v").style.fill = `rgb(255, 255, ${210-(stateVarData[state].iterations * 1.5)})`
+    } else {
+        document.getElementById(state+"v").style.fill = `rgb(${255 - (stateVarData[state].iterations - 140)}, ${255 - (stateVarData[state].iterations - 140)}, 0)`
+    }
+}
+
+function showCalls() {
+    if (currentmapsetting !== "calls") {
+        for (el of document.getElementsByClassName("calls")) {
+            el.style.display = "inline";
+        }
+        document.getElementById("showcallsbox").classList.add("tbclicked");
+        document.getElementById("showcallsbox").classList.remove("tbnotclicked");
+    }
+    if (currentmapsetting == "margins") {
+        for (el of document.getElementsByClassName("margins")) {
+            el.style.display = "none";
+        }
+        document.getElementById("showmarginsbox").classList.remove("tbclicked");
+        document.getElementById("showmarginsbox").classList.add("tbnotclicked");
+    }
+    if (currentmapsetting == "votes") {
+        for (el of document.getElementsByClassName("votes")) {
+            el.style.display = "none";
+        }
+        document.getElementById("showpctbox").classList.remove("tbclicked");
+        document.getElementById("showpctbox").classList.add("tbnotclicked");
+    }
+    currentmapsetting = "calls";
+}
+
+function showMargins() {
+    if (currentmapsetting !== "margins") {
+        for (el of document.getElementsByClassName("margins")) {
+            el.style.display = "inline";
+        }
+        document.getElementById("showmarginsbox").classList.add("tbclicked");
+        document.getElementById("showmarginsbox").classList.remove("tbnotclicked");
+    }
+    if (currentmapsetting == "calls") {
+        for (el of document.getElementsByClassName("calls")) {
+            el.style.display = "none";
+        }
+        document.getElementById("showcallsbox").classList.remove("tbclicked");
+        document.getElementById("showcallsbox").classList.add("tbnotclicked");
+    }
+    if (currentmapsetting == "votes") {
+        for (el of document.getElementsByClassName("votes")) {
+            el.style.display = "none";
+        }
+        document.getElementById("showpctbox").classList.remove("tbclicked");
+        document.getElementById("showpctbox").classList.add("tbnotclicked");
+    }
+    currentmapsetting = "margins";
+}
+
+function showPct() {
+    if (currentmapsetting !== "votes") {
+        for (el of document.getElementsByClassName("votes")) {
+            el.style.display = "inline";
+        }
+        document.getElementById("showpctbox").classList.add("tbclicked");
+        document.getElementById("showpctbox").classList.remove("tbnotclicked");
+    }
+    if (currentmapsetting == "calls") {
+        for (el of document.getElementsByClassName("calls")) {
+            el.style.display = "none";
+        }
+        document.getElementById("showcallsbox").classList.remove("tbclicked");
+        document.getElementById("showcallsbox").classList.add("tbnotclicked");
+    }
+    if (currentmapsetting == "margins") {
+        for (el of document.getElementsByClassName("margins")) {
+            el.style.display = "none";
+        }
+        document.getElementById("showmarginsbox").classList.remove("tbclicked");
+        document.getElementById("showmarginsbox").classList.add("tbnotclicked");
+    }
+    currentmapsetting = "votes";
+}

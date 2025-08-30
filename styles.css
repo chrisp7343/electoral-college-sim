@@ -100,8 +100,6 @@ body {
     }
 }
 
-.test {
-    background-color: lightblue;
 
 
 .top {
@@ -110,9 +108,6 @@ body {
     transition: fill ease-out 0.5s, opacity ease-out 0.5s;
 }
 
-.test:hover {
-    background-color: lightgreen;
-    cursor: pointer;
 .calls {
     fill: #D0D0D0;
     transition: fill ease 1s, display ease 1s;
@@ -125,8 +120,6 @@ body {
     transition: fill ease 1s, display ease 1s;
 }
 
-.al {
-    fill: red;
 
 .state g:hover .top{
     opacity: 1;
@@ -134,20 +127,17 @@ body {
     cursor: pointer;
 }
 
-.state path:hover {
-    fill: lightgreen;
 text:hover {
     cursor: pointer;
 }
 
-.dccircle:hover {
-    fill: lightgreen;
 text {
     font-size: 20px;
 }
 
 .tb {
     padding: 5px 3px;
+    border-radius: 5px;
 }
 
 .tb:hover {
@@ -155,9 +145,32 @@ text {
 }
 
 .tbclicked {
-
+    background-color: lightskyblue;
 }
 
 .tbnotclicked {
+    background-color: lightgray;
+}
 
+.t {
+    padding: 6px 2px;
+    border: 2px solid black;
+    border-radius: 3px;
+}
+.t:hover {
+    cursor: pointer;
+    background-color: lightblue;
+}
+.t:active {
+    background-color: lightgreen;
+}
+
+#statebutton:hover, #nationalbutton:hover {
+    cursor: pointer;
+    background-color: lightblue;
+}
+
+#statebutton:active, #nationalbutton:active {
+    cursor: pointer;
+    background-color: lightgreen;
 }
