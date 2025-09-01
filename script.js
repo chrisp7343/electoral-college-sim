@@ -199,31 +199,36 @@ function showStateInfo(state = currentclickedstate) {
     nationalclicked = false;
     currentclickedstate = state;
 
-    
-    document.getElementById("statebutton").innerHTML = stateFixedData[state].statename;
-    let rrvotes = `Republican: ${stateVarData[state].rvotes}`;
-    let rdvotes = `Democrat: ${stateVarData[state].dvotes}`;
-    document.getElementById("reportingamount").innerHTML=`${stateVarData[state].iterations / 2}% Reporting`
-    if (stateVarData[state].dvotes > stateVarData[state].rvotes) {
-        document.getElementById("winningvotes").innerHTML = rdvotes;
-        document.getElementById("winningvotes").style.color = "blue";
-        document.getElementById("losingvotes").innerHTML = rrvotes;
-        document.getElementById("losingvotes").style.color = "red";
+    if (currentclickedstate == "") {
+        document.getElementById("statestatus").innerHTML = "Click a state for more info.";
+        document.getElementById("reportingamount").innerHTML = "";
+        document.getElementById("winningvotes").innerHTML = "";
+        document.getElementById("losingvotes").innerHTML = "";
     } else {
-        document.getElementById("winningvotes").innerHTML = rrvotes;
-        document.getElementById("winningvotes").style.color = "red";
-        document.getElementById("losingvotes").innerHTML = rdvotes;
-        document.getElementById("losingvotes").style.color = "blue";
+        document.getElementById("statebutton").innerHTML = stateFixedData[state].statename;
+        let rrvotes = `Republican: ${commaReturner(stateVarData[state].rvotes)} (${(percentageReturner(stateVarData[state].rvotes, stateVarData[state].rvotes + stateVarData[state].dvotes))})`;
+        let rdvotes = `Democrat: ${commaReturner(stateVarData[state].dvotes)} (${(percentageReturner(stateVarData[state].dvotes, stateVarData[state].rvotes + stateVarData[state].dvotes))})`;
+        document.getElementById("reportingamount").innerHTML=`${stateVarData[state].iterations / 2}% Reporting`
+        if (stateVarData[state].dvotes > stateVarData[state].rvotes) {
+            document.getElementById("winningvotes").innerHTML = rdvotes;
+            document.getElementById("winningvotes").style.color = "blue";
+            document.getElementById("losingvotes").innerHTML = rrvotes;
+            document.getElementById("losingvotes").style.color = "red";
+        } else {
+            document.getElementById("winningvotes").innerHTML = rrvotes;
+            document.getElementById("winningvotes").style.color = "red";
+            document.getElementById("losingvotes").innerHTML = rdvotes;
+            document.getElementById("losingvotes").style.color = "blue";
+        }
+        document.getElementById("statestatus").innerHTML = stateVarData[state].status;
     }
-    document.getElementById("statestatus").innerHTML = stateVarData[state].status;
 }
 
 function showNationalInfo() {
     nationalclicked = true;
-    
 
-    let rrvotes = `Republican: ${globalnationalrvotes}`
-    let rdvotes = `Democrat: ${globalnationaldvotes}`
+    let rrvotes = `Republican: ${commaReturner(globalnationalrvotes)} (${(percentageReturner(globalnationalrvotes, globalnationalrvotes + globalnationaldvotes))})`
+    let rdvotes = `Democrat: ${commaReturner(globalnationaldvotes)} (${(percentageReturner(globalnationaldvotes, globalnationalrvotes + globalnationaldvotes))})`
     document.getElementById("reportingamount").innerHTML = `Republican: ${revs} - Democratic: ${devs}`;
     if (globalnationaldvotes > globalnationalrvotes) {
         document.getElementById("winningvotes").innerHTML = rdvotes;
@@ -236,11 +241,7 @@ function showNationalInfo() {
         document.getElementById("losingvotes").innerHTML = rdvotes;
         document.getElementById("losingvotes").style.color = "blue";
     }
-    document.getElementById("statestatus").innerHTML = ".";
-}
-
-function checkForUpdates () {
-
+    document.getElementById("statestatus").innerHTML = "";
 }
 
 function addEvent(text, color, bold = false) {
@@ -253,7 +254,7 @@ function addEvent(text, color, bold = false) {
     event.style.gap = "4px";
 
     const timestamp = document.createElement("span");
-    timestamp.innerHTML = globaltime;
+    timestamp.innerHTML = convertTime(globaltime);
     timestamp.style.color = "gray";
     timestamp.style.fontSize = "0.9em";
 
@@ -490,14 +491,34 @@ function convertTime(min) {
     var mind60 = min % 60;
     var hour = Math.floor(min / 60);
     var ampm = "pm";
-    if (((hour + 7) / 12) % 2 > 1) {
+    if (((hour + 6) / 12) % 2 > 1) {
         ampm = "am";
     } else {
         ampm = "pm";
     }
-    hour = ((hour + 5) % 12) + 1;
+    hour = ((hour + 6 ) % 12) + 1;
     if (mind60 < 10) {
         mind60 = `0${mind60}`;
     }
     return `${hour}:${mind60} ${ampm}`
+}
+
+function percentageReturner(val, total) {
+    if (val == 0) {
+        return "0%";
+    } else {
+        return `${(Math.round(val / total * 1000)) / 10}%`;
+    }
+}
+
+function commaReturner(val) {
+    strval = val.toString();
+    len = strval.length;
+    if (len <= 3) {
+        return strval;
+    } else if (len <= 6) {
+        return `${strval.substring(0, len - 3)},${strval.substring(len - 3, len)}`;
+    } else {
+        return `${strval.substring(0, len - 6)},${strval.substring(len - 6, len - 3)},${strval.substring(len - 3, len)}`;
+    }
 }
