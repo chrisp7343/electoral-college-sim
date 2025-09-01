@@ -170,7 +170,7 @@ function increaseTime() {
         showStateInfo();
     }
 
-    document.getElementById("time").innerHTML = globaltime + " minutes";
+    document.getElementById("time").innerHTML = convertTime(globaltime);
 }
 
 function increaseTime5() {
@@ -199,6 +199,7 @@ function showStateInfo(state = currentclickedstate) {
     nationalclicked = false;
     currentclickedstate = state;
 
+    
     document.getElementById("statebutton").innerHTML = stateFixedData[state].statename;
     let rrvotes = `Republican: ${stateVarData[state].rvotes}`;
     let rdvotes = `Democrat: ${stateVarData[state].dvotes}`;
@@ -219,6 +220,7 @@ function showStateInfo(state = currentclickedstate) {
 
 function showNationalInfo() {
     nationalclicked = true;
+    
 
     let rrvotes = `Republican: ${globalnationalrvotes}`
     let rdvotes = `Democrat: ${globalnationaldvotes}`
@@ -351,6 +353,7 @@ function callState(state) {
         calledforreps.push(state);
         document.getElementById(state+"c").style.fill = "rgb(230, 100, 100)"; 
         revs += stateFixedData[state].electoralvotes;
+        updateEBar();
         
     } else if (numoftests === -20) {
         stateVarData[state].status = "Called for Democrats";
@@ -358,6 +361,7 @@ function callState(state) {
         calledfordems.push(state); 
         document.getElementById(state+"c").style.fill = "rgb(100, 100, 230)";
         devs += stateFixedData[state].electoralvotes;
+        updateEBar();
     }
 }
 
@@ -366,6 +370,17 @@ function checkStateDoneCounting(state) {
         removeItem(statescounting, state);
         statescounted.push(state);
     }
+}
+
+function updateEBar() {
+    const dpercent = devs / 538 * 100;
+    const rpercent = revs / 538 * 100;
+
+    document.getElementById("democraticevs").style.width = `${dpercent}%`
+    document.getElementById("republicanevs").style.width = `${rpercent}%`
+
+    document.getElementById("devsnum").innerHTML = devs;
+    document.getElementById("revsnum").innerHTML = revs;
 }
 
 function updateMargins(state) {
@@ -469,4 +484,20 @@ function showPct() {
         document.getElementById("showmarginsbox").classList.add("tbnotclicked");
     }
     currentmapsetting = "votes";
+}
+
+function convertTime(min) {
+    var mind60 = min % 60;
+    var hour = Math.floor(min / 60);
+    var ampm = "pm";
+    if (((hour + 7) / 12) % 2 > 1) {
+        ampm = "am";
+    } else {
+        ampm = "pm";
+    }
+    hour = ((hour + 5) % 12) + 1;
+    if (mind60 < 10) {
+        mind60 = `0${mind60}`;
+    }
+    return `${hour}:${mind60} ${ampm}`
 }
