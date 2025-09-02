@@ -1,6 +1,6 @@
 var globaltime = -1;
 var globalnumupdates = 0;
-
+var electionwon = false;
 
 var globalshift = 0;
 let shiftgen = Math.random();
@@ -171,6 +171,17 @@ function increaseTime() {
     }
 
     document.getElementById("time").innerHTML = convertTime(globaltime);
+
+    if (revs >= 270 && electionwon == false) {
+        addEvent("The Republicans have reached 270 and won the presidency!", "red", true);
+        electionwon = true;
+    } else if (devs >= 270 && electionwon == false) {
+        addEvent("The Democrats have reached 270 and won the presidency!", "blue", true);
+        electionwon = true;
+    } else if (revs == 269 && devs == 269 && electionwon == false) {
+        addEvent("The Electoral College is a tie, sending the election to the House!", "purple", true);
+        electionwon = true;
+    }
 }
 
 function increaseTime5() {
