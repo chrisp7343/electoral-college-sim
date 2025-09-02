@@ -490,13 +490,14 @@ function showPct() {
 function convertTime(min) {
     var mind60 = min % 60;
     var hour = Math.floor(min / 60);
-    var ampm = "pm";
-    if (((hour + 6) / 12) % 2 > 1) {
+    var rhour = hour;
+    var ampm = "";
+    if (Math.floor((rhour + 7) / 12) % 2 == 1) {
         ampm = "am";
     } else {
-        ampm = "pm";
+        ampm = "pm";    
     }
-    hour = ((hour + 6 ) % 12) + 1;
+    hour = ((hour + 6) % 12) + 1;
     if (mind60 < 10) {
         mind60 = `0${mind60}`;
     }
